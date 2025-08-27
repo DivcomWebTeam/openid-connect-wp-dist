@@ -13,21 +13,21 @@
  * @link      https://github.com/forumone
  *
  * @wordpress-plugin
- * Plugin Name:       OpenID Connect for WP
- * Plugin URI:        https://github.com/forumone/openid-connect-wp-dist
- * Description:       Connect to an OpenID Connect identity provider using Authorization Code Flow.
- * Version:           4.0.0
+ * Plugin Name:       OpenID Connect for WP (Divcom Fork)
+ * Plugin URI:        https://github.com/DivcomWebTeam/openid-connect-wp-dist
+ * Description:       Connect to an OpenID Connect identity provider using Authorization Code Flow. Enhanced with custom error message support.
+ * Version:           4.0.1-divcom
  * Requires at least: 5.0
  * Requires PHP:      7.4
- * Author:            forum1
+ * Author:            forum1, Divcom
  * Author URI:        http://www.forumone.com
  * Text Domain:       openid-connect-wp
  * Domain Path:       /languages
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * GitHub Plugin URI: https://github.com/forumone/openid-connect-wp-dist
+ * GitHub Plugin URI: https://github.com/DivcomWebTeam/openid-connect-wp-dist
  * Primary Branch:    main
- * Update URI:        https://github.com/forumone/openid-connect-wp-dist
+ * Update URI:        https://github.com/DivcomWebTeam/openid-connect-wp-dist
  */
 
 /*
@@ -306,6 +306,16 @@ class OpenID_Connect_WP {
 
 		if ( ! empty( $states ) ) {
 			foreach ( $states as $state ) {
+				$transient = str_replace( '_transient_', '', $state );
+				get_transient( $transient );
+			}
+		}
+		
+		// Also clean up fallback state transients
+		$fallback_states = $wpdb->get_col( "SELECT `option_name` FROM {$wpdb->options} WHERE `option_name` LIKE '_transient_openid-connect-wp-fallback-state--%'" );
+
+		if ( ! empty( $fallback_states ) ) {
+			foreach ( $fallback_states as $state ) {
 				$transient = str_replace( '_transient_', '', $state );
 				get_transient( $transient );
 			}

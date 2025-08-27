@@ -373,6 +373,11 @@ class OpenID_Connect_WP_Client {
 			),
 		);
 		set_transient( 'openid-connect-wp-state--' . $state, $state_value, $this->state_time_limit );
+		
+		// Set a longer-lived fallback transient for cases where the main state expires
+		// This allows redirect recovery even when state validation fails due to timeout
+		$fallback_time_limit = $this->state_time_limit * 10; // 30 minutes instead of 3 minutes
+		set_transient( 'openid-connect-wp-fallback-state--' . $state, $state_value, $fallback_time_limit );
 
 		return $state;
 	}
